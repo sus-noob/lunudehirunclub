@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Join the Run Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* ===================================================================
+     1. BRANDING — change these to make it yours
+     =================================================================== */
+  :root {
+    --accent:        #2F5D50;   /* main brand colour (buttons, focus) */
+    --accent-deep:   #1E3D34;   /* darker shade for hovers */
+    --accent-soft:   #EAF2EE;   /* tint used behind the card glow */
+    --ink:           #18211E;   /* headings + dark text */
+    --muted:         #5C6B65;   /* sub copy */
+    --surface:       #FFFFFF;   /* card background */
+    --page:          #F3F1EB;   /* page background */
+    --line:          #E2E0D8;   /* hairlines + input border */
+    --radius:        18px;
+  }
+
+  /* ===================================================================
+     2. LAYOUT
+     =================================================================== */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(60% 50% at 50% 0%, var(--accent-soft) 0%, transparent 70%),
+      var(--page);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 40px 36px 32px;
+    box-shadow: 0 1px 2px rgba(24,33,30,.04), 0 24px 48px -24px rgba(24,33,30,.18);
+  }
+
+  .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 30px;
+    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin: 0 0 12px;
+  }
+
+  .sub {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+    margin: 0 0 28px;
+  }
+
+  /* ===================================================================
+     3. FORM
+     =================================================================== */
+  .field { position: relative; margin-bottom: 12px; }
+
+  input[type="email"] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    padding: 15px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #FBFBF9;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  input[type="email"]::placeholder { color: #9AA39E; }
+  input[type="email"]:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(47,93,80,.14);
+  }
+
+  /* honeypot — hidden from people, catches bots */
+  .gotcha { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
+
+  button {
+    width: 100%;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: background .15s, transform .05s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+  }
+  button:hover:not(:disabled) { background: var(--accent-deep); }
+  button:active:not(:disabled) { transform: scale(.99); }
+  button:disabled { opacity: .7; cursor: default; }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .note {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin: 16px 0 0;
+    min-height: 18px;
+  }
+  .note.error { color: #B4452F; }
+
+  /* ===================================================================
+     4. SUCCESS STATE
+     =================================================================== */
+  .done {
+    text-align: center;
+    animation: rise .4s ease both;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .check {
+    width: 56px; height: 56px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: grid; place-items: center;
+  }
+  .check svg { width: 28px; height: 28px; }
+  .done h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px; font-weight: 700; margin: 0 0 8px;
+  }
+  .done p { color: var(--muted); font-size: 15px; margin: 0; }
+
+  .hidden { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+  <main class="card" role="main">
+    <!-- FORM VIEW -->
+    <div id="formView">
+      <p class="eyebrow">Lunudehi Run Club</p>
+      <h1>Run with us.</h1>
+      <p class="sub">Want to join the run club? Drop your email and we'll send you the details on where and when we meet.</p>
+
+      <div class="field">
+        <input id="email" type="email" inputmode="email" autocomplete="email"
+               placeholder="you@example.com" aria-label="Email address" />
+        <input class="gotcha" type="text" id="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      </div>
+
+      <button id="submit" type="button">
+        <span id="btnLabel">Join the run club</span>
+      </button>
+
+      <p class="note" id="note" aria-live="polite"></p>
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div id="doneView" class="done hidden">
+      <div class="check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </div>
+      <h2>You're in</h2>
+      <p>Welcome to the club. Check your inbox for the next run.</p>
+    </div>
+  </main>
+
+<script>
+  /* ===================================================================
+     CONFIG — paste your Apps Script Web App URL here
+     =================================================================== */
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwUmOgpmA-Dny1B7I8BKo0MekhQ9F53zN4nRTZfBDJPzmU6q2p1mGqnFgX0qZ2Pm-Fh/exec';
+  var SOURCE   = 'portal'; // shows up in the "Source" column, handy if you run more than one
+
+  var emailEl  = document.getElementById('email');
+  var coEl      = document.getElementById('company');
+  var btn       = document.getElementById('submit');
+  var btnLabel  = document.getElementById('btnLabel');
+  var note      = document.getElementById('note');
+  var formView  = document.getElementById('formView');
+  var doneView  = document.getElementById('doneView');
+
+  function valid(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  function setError(msg) {
+    note.textContent = msg;
+    note.classList.add('error');
+  }
+  function clearNote() {
+    note.textContent = '';
+    note.classList.remove('error');
+  }
+
+  function loading(on) {
+    btn.disabled = on;
+    btnLabel.innerHTML = on
+      ? '<span class="spinner"></span>'
+      : 'Join the run club';
+  }
+
+  function succeed() {
+    formView.classList.add('hidden');
+    doneView.classList.remove('hidden');
+  }
+
+  async function submit() {
+    clearNote();
+    var email = emailEl.value.trim();
+
+    if (!valid(email)) {
+      setError('Please enter a valid email address.');
+      emailEl.focus();
+      return;
+    }
+
+    if (ENDPOINT === 'PASTE_YOUR_WEB_APP_URL_HERE') {
+      setError('Not connected yet. Add your Web App URL in the script config.');
+      return;
+    }
+
+    loading(true);
+    try {
+      var res = await fetch(ENDPOINT, {
+        method: 'POST',
+        // text/plain avoids a CORS preflight that Apps Script can't answer
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ email: email, company: coEl.value, source: SOURCE })
+      });
+      var data = await res.json();
+      if (data.result === 'success') {
+        succeed();
+      } else {
+        loading(false);
+        setError(data.message || 'Something went wrong. Try again.');
+      }
+    } catch (err) {
+      loading(false);
+      setError('Could not connect. Please try again in a moment.');
+    }
+  }
+
+  btn.addEventListener('click', submit);
+  emailEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') submit();
+  });
+  emailEl.addEventListener('input', clearNote);
+</script>
+</body>
+</html>
