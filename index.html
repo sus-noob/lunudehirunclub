@@ -8,24 +8,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 <style>
-  /* ===================================================================
-     1. BRANDING — change these to make it yours
-     =================================================================== */
   :root {
-    --accent:        #2F5D50;   /* main brand colour (buttons, focus) */
-    --accent-deep:   #1E3D34;   /* darker shade for hovers */
-    --accent-soft:   #EAF2EE;   /* tint used behind the card glow */
-    --ink:           #18211E;   /* headings + dark text */
-    --muted:         #5C6B65;   /* sub copy */
-    --surface:       #FFFFFF;   /* card background */
-    --page:          #F3F1EB;   /* page background */
-    --line:          #E2E0D8;   /* hairlines + input border */
+    --accent:        #2F5D50;
+    --accent-deep:   #1E3D34;
+    --accent-soft:   #EAF2EE;
+    --ink:           #18211E;
+    --muted:         #5C6B65;
+    --surface:       #FFFFFF;
+    --page:          #F3F1EB;
+    --line:          #E2E0D8;
     --radius:        18px;
   }
 
-  /* ===================================================================
-     2. LAYOUT
-     =================================================================== */
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   body {
@@ -76,11 +70,9 @@
     margin: 0 0 28px;
   }
 
-  /* ===================================================================
-     3. FORM
-     =================================================================== */
   .field { position: relative; margin-bottom: 12px; }
 
+  input[type="text"],
   input[type="email"] {
     width: 100%;
     font-family: inherit;
@@ -92,7 +84,9 @@
     background: #FBFBF9;
     transition: border-color .15s, box-shadow .15s, background .15s;
   }
+  input[type="text"]::placeholder,
   input[type="email"]::placeholder { color: #9AA39E; }
+  input[type="text"]:focus,
   input[type="email"]:focus {
     outline: none;
     background: #fff;
@@ -100,7 +94,6 @@
     box-shadow: 0 0 0 4px rgba(47,93,80,.14);
   }
 
-  /* honeypot — hidden from people, catches bots */
   .gotcha { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
 
   button {
@@ -143,9 +136,6 @@
   }
   .note.error { color: #B4452F; }
 
-  /* ===================================================================
-     4. SUCCESS STATE
-     =================================================================== */
   .done {
     text-align: center;
     animation: rise .4s ease both;
@@ -177,9 +167,14 @@
   <main class="card" role="main">
     <!-- FORM VIEW -->
     <div id="formView">
-      <p class="eyebrow">Lunudehi Run Club</p>
+      <p class="eyebrow">Lunu Dehi Run Club</p>
       <h1>Run with us.</h1>
-      <p class="sub">Drop your email to join the club. It's how we send out running schedules, upcoming events, and everything else going on.</p>
+      <p class="sub">Drop your details to join the club. It's how we send out running schedules, upcoming events, and everything else going on.</p>
+
+      <div class="field">
+        <input id="name" type="text" inputmode="text" autocomplete="given-name"
+               placeholder="Your first name" aria-label="First name" />
+      </div>
 
       <div class="field">
         <input id="email" type="email" inputmode="email" autocomplete="email"
@@ -207,21 +202,19 @@
   </main>
 
 <script>
-  /* ===================================================================
-     CONFIG — paste your Apps Script Web App URL here
-     =================================================================== */
   var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwUmOgpmA-Dny1B7I8BKo0MekhQ9F53zN4nRTZfBDJPzmU6q2p1mGqnFgX0qZ2Pm-Fh/exec';
-  var SOURCE   = 'portal'; // shows up in the "Source" column, handy if you run more than one
+  var SOURCE   = 'portal';
 
+  var nameEl   = document.getElementById('name');
   var emailEl  = document.getElementById('email');
-  var coEl      = document.getElementById('company');
-  var btn       = document.getElementById('submit');
-  var btnLabel  = document.getElementById('btnLabel');
-  var note      = document.getElementById('note');
-  var formView  = document.getElementById('formView');
-  var doneView  = document.getElementById('doneView');
+  var coEl     = document.getElementById('company');
+  var btn      = document.getElementById('submit');
+  var btnLabel = document.getElementById('btnLabel');
+  var note     = document.getElementById('note');
+  var formView = document.getElementById('formView');
+  var doneView = document.getElementById('doneView');
 
-  function valid(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
   function setError(msg) {
     note.textContent = msg;
@@ -246,16 +239,17 @@
 
   async function submit() {
     clearNote();
+    var name  = nameEl.value.trim();
     var email = emailEl.value.trim();
 
-    if (!valid(email)) {
-      setError('Please enter a valid email address.');
-      emailEl.focus();
+    if (!name) {
+      setError('Please enter your first name.');
+      nameEl.focus();
       return;
     }
-
-    if (ENDPOINT === 'PASTE_YOUR_WEB_APP_URL_HERE') {
-      setError('Not connected yet. Add your Web App URL in the script config.');
+    if (!validEmail(email)) {
+      setError('Please enter a valid email address.');
+      emailEl.focus();
       return;
     }
 
@@ -263,9 +257,8 @@
     try {
       var res = await fetch(ENDPOINT, {
         method: 'POST',
-        // text/plain avoids a CORS preflight that Apps Script can't answer
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ email: email, company: coEl.value, source: SOURCE })
+        body: JSON.stringify({ name: name, email: email, company: coEl.value, source: SOURCE })
       });
       var data = await res.json();
       if (data.result === 'success') {
@@ -281,9 +274,9 @@
   }
 
   btn.addEventListener('click', submit);
-  emailEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') submit();
-  });
+  emailEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') submit(); });
+  nameEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') emailEl.focus(); });
+  nameEl.addEventListener('input', clearNote);
   emailEl.addEventListener('input', clearNote);
 </script>
 </body>
