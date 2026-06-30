@@ -73,7 +73,8 @@
   .field { position: relative; margin-bottom: 12px; }
 
   input[type="text"],
-  input[type="email"] {
+  input[type="email"],
+  input[type="tel"] {
     width: 100%;
     font-family: inherit;
     font-size: 16px;
@@ -85,9 +86,11 @@
     transition: border-color .15s, box-shadow .15s, background .15s;
   }
   input[type="text"]::placeholder,
-  input[type="email"]::placeholder { color: #9AA39E; }
+  input[type="email"]::placeholder,
+  input[type="tel"]::placeholder { color: #9AA39E; }
   input[type="text"]:focus,
-  input[type="email"]:focus {
+  input[type="email"]:focus,
+  input[type="tel"]:focus {
     outline: none;
     background: #fff;
     border-color: var(--accent);
@@ -168,8 +171,8 @@
     <!-- FORM VIEW -->
     <div id="formView">
       <p class="eyebrow">Lunu Dehi Run Club</p>
-      <h1>Run with us.</h1>
-      <p class="sub">Drop your details to join the club. It's how we send out running schedules, upcoming events, and everything else going on.</p>
+      <h1>Join our Sunday run club.</h1>
+      <p class="sub">We run together every Sunday in London, then grab a coffee after. Pop your details below and we'll email you the schedule and everything else you need to know.</p>
 
       <div class="field">
         <input id="name" type="text" inputmode="text" autocomplete="given-name"
@@ -180,6 +183,11 @@
         <input id="email" type="email" inputmode="email" autocomplete="email"
                placeholder="you@example.com" aria-label="Email address" />
         <input class="gotcha" type="text" id="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      </div>
+
+      <div class="field">
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel"
+               placeholder="Your phone number" aria-label="Phone number" />
       </div>
 
       <button id="submit" type="button">
@@ -207,6 +215,7 @@
 
   var nameEl   = document.getElementById('name');
   var emailEl  = document.getElementById('email');
+  var phoneEl  = document.getElementById('phone');
   var coEl     = document.getElementById('company');
   var btn      = document.getElementById('submit');
   var btnLabel = document.getElementById('btnLabel');
@@ -215,6 +224,7 @@
   var doneView = document.getElementById('doneView');
 
   function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function validPhone(v) { return /^[0-9+()\-\s]{7,}$/.test(v); }
 
   function setError(msg) {
     note.textContent = msg;
@@ -241,6 +251,7 @@
     clearNote();
     var name  = nameEl.value.trim();
     var email = emailEl.value.trim();
+    var phone = phoneEl.value.trim();
 
     if (!name) {
       setError('Please enter your first name.');
@@ -252,13 +263,23 @@
       emailEl.focus();
       return;
     }
+    if (!phone) {
+      setError('Please enter your phone number.');
+      phoneEl.focus();
+      return;
+    }
+    if (!validPhone(phone)) {
+      setError('Please enter a valid phone number.');
+      phoneEl.focus();
+      return;
+    }
 
     loading(true);
     try {
       var res = await fetch(ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ name: name, email: email, company: coEl.value, source: SOURCE })
+        body: JSON.stringify({ name: name, email: email, phone: phone, company: coEl.value, source: SOURCE })
       });
       var data = await res.json();
       if (data.result === 'success') {
@@ -274,10 +295,12 @@
   }
 
   btn.addEventListener('click', submit);
-  emailEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') submit(); });
+  emailEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') phoneEl.focus(); });
   nameEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') emailEl.focus(); });
+  phoneEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') submit(); });
   nameEl.addEventListener('input', clearNote);
   emailEl.addEventListener('input', clearNote);
+  phoneEl.addEventListener('input', clearNote);
 </script>
 </body>
 </html>
